@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  traefik:
+    image: traefik:latest
+    ports:
+      - 80:80
+      - 8081:8080
+    volumes:
+      - ./examples/traefik.yml:/etc/traefik/traefik.yml
+
+  openstack:
+    image: netways/traefik-openstack-provider
+    build: .
+    environment: {}
+      #OS_AUTH_URL: https://openstack.example.com:5000/v3/
+      #OS_PROJECT_ID: hashed_id
+      #OS_USERNAME: username
+      #OS_PASSWORD: password
+      #OS_DOMAIN_NAME: Default
