@@ -8,7 +8,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/sirupsen/logrus v1.7.0
 	github.com/stretchr/testify v1.7.0
-	github.com/traefik/traefik/v2 v2.4.8
+	github.com/traefik/traefik/v2 v2.4.13
 )
 
 // Containous forks for traefik - we can't compile without them
