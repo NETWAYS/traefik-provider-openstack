@@ -20,7 +20,7 @@ func GetServerAddresses(input map[string]interface{}) (addresses ServerAddresses
 	for poolName, pool := range input {
 		poolAddresses, ok := pool.([]interface{})
 		if !ok {
-			err = fmt.Errorf("could not decode pool address: %s", pool)
+			err = fmt.Errorf("could not decode pool address to []interface{}%s", pool)
 			return
 		}
 

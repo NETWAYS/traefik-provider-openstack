@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 )
@@ -16,7 +16,7 @@ type ErrorResponse struct {
 }
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
-	Error(w, r, fmt.Errorf("404 Not Found"), http.StatusNotFound)
+	Error(w, r, errors.New("404 Not Found"), http.StatusNotFound)
 }
 
 func Error(w http.ResponseWriter, r *http.Request, err error, code int) {
@@ -34,8 +34,4 @@ func RespondWithJSON(w http.ResponseWriter, data interface{}, code int) {
 	if err != nil {
 		log.WithError(err).Error("could not write result to client")
 	}
-}
-
-func init() {
-	Router.NotFoundHandler = http.HandlerFunc(NotFound)
 }

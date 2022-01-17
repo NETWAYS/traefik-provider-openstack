@@ -29,6 +29,7 @@ func (s Server) GetAddress(kind string) (address string, err error) {
 				address = a.Address
 				return
 			}
+
 			if first == "" {
 				first = a.Address
 			}
@@ -57,11 +58,13 @@ func (s Server) RegisterConfiguration(configurations map[string]*dynamic.Configu
 			key, err = s.EvalTemplate(key)
 			if err != nil {
 				err = fmt.Errorf("could not execute template for label key '%s': %w", key, err)
+				return
 			}
 
 			value, err = s.EvalTemplate(value)
 			if err != nil {
 				err = fmt.Errorf("could not execute template for label value '%s': %w", value, err)
+				return
 			}
 
 			labels[key] = value
@@ -81,6 +84,7 @@ func (s Server) RegisterConfiguration(configurations map[string]*dynamic.Configu
 	config, err := label.DecodeConfiguration(labels)
 	if err != nil {
 		err = fmt.Errorf("could not decode labels: %w", err)
+
 		return
 	}
 
@@ -112,9 +116,10 @@ func (s Server) RegisterConfiguration(configurations map[string]*dynamic.Configu
 
 		// Set service when not set
 		if router.Service == "" {
-			for name, _ := range config.HTTP.Services {
+			for name := range config.HTTP.Services {
 				// Just use the first and break
 				router.Service = name
+
 				break
 			}
 		}
@@ -141,47 +146,6 @@ func (s Server) RegisterConfiguration(configurations map[string]*dynamic.Configu
 
 	configurations[s.Name] = config
 
-	/*
-		name := s.Name
-		host := s.Name
-		hostCockpit := s.Name + "-cockpit"
-
-		// TODO: filter Status
-		// TODO: filter Tags?
-
-		if settings.Domain != "" {
-			host += "." + settings.Domain
-			hostCockpit += "." + settings.Domain
-		}
-
-		router := "traefik.http.routers." + name
-		service := "traefik.http.services." + name
-
-		address, err := s.GetAddress(settings.AddressType)
-		if err != nil {
-			return
-		}
-
-		labels := map[string]string{
-			router + ".entrypoints":                      "http", // TODO
-			router + ".rule":                             fmt.Sprintf("Host(`%s`)", host),
-			router + ".service":                          name,
-			service + ".loadBalancer.server.url":         fmt.Sprintf("http://%s/", address),
-			router + "-cockpit.entrypoints":              "http", // TODO
-			router + "-cockpit.rule":                     fmt.Sprintf("Host(`%s`)", hostCockpit),
-			router + "-cockpit.service":                  name + "-cockpit",
-			service + "-cockpit.loadBalancer.server.url": fmt.Sprintf("https://%s:9090/", address),
-		}
-
-		config, err := label.DecodeConfiguration(labels)
-		if err != nil {
-			err = fmt.Errorf("could not decode labels: %w", err)
-			return
-		}
-
-		configurations[name] = config
-	*/
-
 	return
 }
 
@@ -199,17 +163,4 @@ func (s Server) EvalTemplate(t string) (string, error) {
 	}
 
 	return buf.String(), nil
-}
-
-func (s Server) BuildStandardLabels(settings Settings) map[string]string {
-	return map[string]string{
-		//"traefik.http.routers."+s.Name+".entrypoints":                       "{ENTRYPOINT}",
-		//"traefik.http.routers."+s.Name+"-cockpit.entrypoints":               "{ENTRYPOINT}",
-		//"traefik.http.routers." + s.Name + ".service":                           s.Name,
-		//"traefik.http.routers." + s.Name + "-cockpit.service":                   s.Name + "-cockpit",
-		//"traefik.http.routers." + s.Name + ".rule":                              settings.DefaultRule,
-		//"traefik.http.services." + s.Name + ".loadBalancer.server.port":         "80",
-		//"traefik.http.routers." + s.Name + ".rule":                      settings.DefaultRule,
-		"traefik.http.services." + s.Name + ".loadBalancer.server.port": "9090",
-	}
 }

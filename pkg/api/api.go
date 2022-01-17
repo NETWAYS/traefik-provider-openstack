@@ -11,24 +11,20 @@ import (
 )
 
 type Server struct {
-	CollectionPath string
-	Server         *http.Server
+	Server *http.Server
 }
 
-var (
-	Router         = mux.NewRouter()
-	DefaultAddress = ":8080"
-)
+const DefaultAddress = ":8080"
 
 func NewServer() (s *Server, err error) {
 	s = &Server{}
 
-	router := *Router
+	router := NewRouter()
 	router.Use(HTTPLogging())
 
 	s.Server = &http.Server{
 		Addr:         DefaultAddress,
-		Handler:      &router,
+		Handler:      router,
 		ErrorLog:     goLog.New(Logger.Writer(), "http: ", goLog.LstdFlags),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -56,6 +52,13 @@ func HandleHome(w http.ResponseWriter, _ *http.Request) {
 	RespondWithJSON(w, MessageResponse{"Welcome, see the /traefik endpoint"}, http.StatusOK)
 }
 
-func init() {
-	Router.HandleFunc("/", HandleHome)
+func NewRouter() *mux.Router {
+	r := mux.NewRouter()
+
+	r.NotFoundHandler = http.HandlerFunc(NotFound)
+	r.HandleFunc("/", HandleHome)
+
+	r.HandleFunc("/traefik", HandleTraefik)
+
+	return r
 }

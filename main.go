@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/NETWAYS/traefik-provider-openstack/pkg/api"
 	"github.com/NETWAYS/traefik-provider-openstack/pkg/discovery"
 	"github.com/NETWAYS/traefik-provider-openstack/pkg/openstack"
@@ -17,15 +16,13 @@ import (
 func main() {
 	err := UpdateConfiguration()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	// Setup HTTP server
 	err = SetupAndStartServer()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }
 
