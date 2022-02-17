@@ -4,11 +4,11 @@ go 1.16
 
 require (
 	github.com/gophercloud/gophercloud v0.17.0
-	github.com/gorilla/mux v1.7.3
-	github.com/mitchellh/mapstructure v1.4.1
-	github.com/sirupsen/logrus v1.7.0
+	github.com/gorilla/mux v1.8.0
+	github.com/mitchellh/mapstructure v1.4.2
+	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.7.0
-	github.com/traefik/traefik/v2 v2.4.13
+	github.com/traefik/traefik/v2 v2.6.1
 )
 
 // Containous forks for traefik - we can't compile without them
