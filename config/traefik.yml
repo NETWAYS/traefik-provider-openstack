@@ -1,0 +1,28 @@
+log:
+  level: WARN # INFO, DEBUG, WARN, ERROR, FATAL, PANIC
+
+serversTransport:
+  insecureSkipVerify: true
+
+accessLog: {}
+
+providers:
+  http:
+    endpoint: http://openstack:8080/traefik
+    pollInterval: 10s
+
+  file:
+    filename: "/etc/traefik/tls.yml"
+
+api:
+  insecure: true
+
+entryPoints:
+  http:
+    address: ":80"
+  https:
+    address: ":443"
+  ssh:
+    address: ":22"
+  cockpit:
+    address: ":9090"

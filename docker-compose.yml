@@ -4,17 +4,22 @@ services:
   traefik:
     image: traefik:latest
     ports:
-      - 80:80
-      - 8081:8080
+      - "80:80"     # HTTP
+      - "443:443"   # HTTPS
+      - "8081:8080" # Traefik Dashboard
+      - "2222:22"   # SSH
+      - "9090:9090" # Cockpit
     volumes:
-      - ./examples/traefik.yml:/etc/traefik/traefik.yml
+      - "./config/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "./config/tls.yml:/etc/traefik/tls.yml:ro"
+      - "./config/certs:/etc/traefik/certs:ro"
 
   openstack:
     image: netways/traefik-openstack-provider
     build: .
     environment: {}
       #OS_AUTH_URL: https://openstack.example.com:5000/v3/
-      #OS_PROJECT_ID: hashed_id
+      #OS_PROJECT_NAME: hashed_id
       #OS_USERNAME: username
       #OS_PASSWORD: password
       #OS_DOMAIN_NAME: Default

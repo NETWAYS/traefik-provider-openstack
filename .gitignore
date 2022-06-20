@@ -1,2 +1,4 @@
 ## Docker
 /docker-compose.*.yml
+/config/certs/*
+.idea

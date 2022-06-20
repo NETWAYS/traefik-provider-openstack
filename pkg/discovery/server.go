@@ -49,6 +49,7 @@ func (s Server) RegisterConfiguration(configurations map[string]*dynamic.Configu
 		labels = make(map[string]string)
 
 		// TODO: filter by traefik prefix?
+		// VM's with the traefik METATAG will be ignored
 		for key, value := range s.Metadata {
 			labels[key] = value
 		}
@@ -140,6 +141,58 @@ func (s Server) RegisterConfiguration(configurations map[string]*dynamic.Configu
 					url := fmt.Sprintf("%s://%s:%s", lbServer.Scheme, address, lbServer.Port)
 					lbServer.URL = url
 				}
+			}
+		}
+	}
+
+	if len(config.TCP.Services) > 0 && len(config.TCP.Routers) == 0 {
+		if config.TCP.Routers == nil {
+			config.TCP.Routers = map[string]*dynamic.TCPRouter{}
+		}
+
+		config.TCP.Routers[s.Name] = &dynamic.TCPRouter{}
+	}
+
+	// Update all routers with unset values
+	for _, router := range config.TCP.Routers {
+		// set entrypoint when not set
+		if len(router.EntryPoints) == 0 {
+			router.EntryPoints = settings.DefaultEntrypoints
+		}
+
+		// set default rule when not set
+		if router.Rule == "" {
+			rule, erro := s.EvalTemplate(settings.DefaultRule)
+			if erro != nil {
+				return erro
+			}
+
+			router.Rule = rule
+		}
+
+		// Set service when not set
+		if router.Service == "" {
+			for name := range config.TCP.Services {
+				// Just use the first and break
+				router.Service = name
+
+				break
+			}
+		}
+	}
+
+	// Check and update services with defaults
+	for _, service := range config.TCP.Services {
+		if service.LoadBalancer != nil {
+			for i := range service.LoadBalancer.Servers {
+				lbServer := &service.LoadBalancer.Servers[i]
+
+				// build URL when port is set
+				if lbServer.Address == "" && lbServer.Port != "" {
+					url := fmt.Sprintf("%s:%s", address, lbServer.Port)
+					lbServer.Address = url
+				}
+
 			}
 		}
 	}
